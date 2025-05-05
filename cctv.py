@@ -1,35 +1,43 @@
 import cv2
 
-# RTSP camera details
-username = "rk11vb"
-password = "Joymathew2004"
-ip_address = "192.168.18.88"
-port = 554
-channel = "101"  # You can change to 102, 103, etc., for other channels
+def display_cctv_feed():
+    # Camera details
+    ip = "192.168.18.88"
+    username = "admin"
+    password = "admin123"
+    
+    # RTSP URL for Hikvision
+    rtsp_url = f"rtsp://{username}:{password}@{ip}/ISAPI/Streaming/Channels/101"
+    
+    # Create video capture object
+    cap = cv2.VideoCapture(rtsp_url)
+    
+    if not cap.isOpened():
+        print("Error: Could not open video stream")
+        print("Possible issues:")
+        print("1. Incorrect credentials")
+        print("2. RTSP not enabled on camera")
+        print("3. Network connectivity problem")
+        return
+    
+    print("Successfully connected to CCTV. Press 'q' to quit.")
+    
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            print("Error: Could not read frame")
+            break
+            
+        # Display the frame
+        cv2.imshow('Hikvision CCTV Feed', frame)
+        
+        # Press 'q' to exit
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    
+    # Release resources
+    cap.release()
+    cv2.destroyAllWindows()
 
-# Construct the RTSP URL
-rtsp_url = f"rtsp://{username}:{password}@{ip_address}:{port}/Streaming/Channels/{channel}"
-
-# Open the video stream
-cap = cv2.VideoCapture(rtsp_url)
-
-if not cap.isOpened():
-    print("Error: Could not open video stream.")
-    exit()
-
-print("Camera stream started. Press 'q' to quit.")
-
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        print("Failed to grab frame.")
-        break
-
-    cv2.imshow("Home Camera", frame)
-
-    # Press 'q' to quit
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-cap.release()
-cv2.destroyAllWindows()
+# Run the function
+display_cctv_feed()
